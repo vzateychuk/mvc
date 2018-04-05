@@ -1,26 +1,25 @@
-stage('Build') {
-    node {
-        git url: 'https://github.com/vzateychuk/mvc.git'
-        env.PATH = "${tool 'MAVEN3'}/bin:${env.PATH}"
-        sh 'mvn clean package'
-        archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
-        sh 'sleep 10'
-    }
-}
-
-stage('SonarQube analysis') {
-    node {
-        withSonarQubeEnv('sonar') {
-            env.PATH = "${tool 'MAVEN3'}/bin:${env.PATH}"
-            sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
-            sh 'sleep 10'
-        }
-    }
-}
-
-stage('deployToDev') {
-    node {
-        sh 'cp "./target/mvc2.war" $CATALINA_HOME/webapps'
+node {
+   def mvnHome
+   stage('Preparation') { // for display purposes
+      // Get some code from a GitHub repository
+      git 'https://github.com/vzateychuk/mvc.git'
+      // Get the Maven tool.
+      mvnHome = tool 'MAVEN3'
+   }
+   stage('Build') {
+      // Run the maven build
+      if (isUnix()) {
+         sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package"
+      } else {
+         bat(/"${mvnHome}\bin\mvn" -Dmaven.test.failure.ignore clean package/)
+      }
+   }
+   stage('Results') {
+      junit '**/target/surefire-reports/TEST-*.xml'
+      archive 'target/*.war'
+   }
+   stage('deployToDev') {
+        sh 'cp ./target/mvc*.war $CATALINA_HOME/webapps/mvc.war'
         sh 'sleep 20'
-    }
+   }
 }
