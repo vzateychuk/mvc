@@ -20,7 +20,7 @@ node {
         sh 'cp ./target/mvc*.war $CATALINA_HOME/webapps/mvc.war'
         sh 'sleep 20'
    }
-   stage('sendEmail'){
-        emailext body: 'Build completed for  ${BRANCH_NAME}', subject: 'Build completed for  ${BRANCH_NAME}', to: 'vzateychuk@gmail.com'
+   stage('complete') {
+       sh 'echo Completed ${BRANCH_NAME}...'
    }
 }
