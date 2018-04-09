@@ -1,8 +1,6 @@
 node {
    def mvnHome
    stage('Preparation') { // for display purposes
-      // Get some code from a GitHub repository
-      git 'https://github.com/vzateychuk/mvc.git'
       // Get the Maven tool.
       mvnHome = tool 'MAVEN3'
    }
@@ -21,5 +19,8 @@ node {
    stage('deployToDev') {
         sh 'cp ./target/mvc*.war $CATALINA_HOME/webapps/mvc.war'
         sh 'sleep 20'
+   }
+   stage('sendEmail'){
+        emailext body: 'Build completed for  ${BRANCH_NAME}', subject: 'Build completed for  ${BRANCH_NAME}', to: 'vzateychuk@gmail.com'
    }
 }
