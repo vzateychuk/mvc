@@ -24,4 +24,7 @@ node {
         sh 'cp ./target/mvc*.war $CATALINA_HOME/webapps/mvc.war'
         sh 'sleep 20'
    }
+   stage('complete') {
+       sh 'echo Completed ${BRANCH_NAME}...'
+   }
 }
